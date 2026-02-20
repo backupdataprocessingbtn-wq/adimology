@@ -1,15 +1,16 @@
-# OPSI A: Deploy ke Cloud (Netlify + Supabase) xxx
+# OPSI A: Deploy ke Cloud (Netlify + Supabase)
 
 Ikuti langkah-langkah berikut secara berurutan untuk menjalankan Adimology di cloud menggunakan Netlify dan Supabase.
 
 ## A1. Setup Supabase
 
 1. Buat akun dan project baru di [Supabase](https://supabase.com/)
-2. Catat kredensial berikut dari **Project Settings > Data API**:
+2. Catat kredensial berikut dari **Integration > Data API**:
    - `Project URL` → untuk `NEXT_PUBLIC_SUPABASE_URL`
 3. Catat kredensial berikut dari **Project Settings > API Keys > Legacy anon, service_role API keys**:
    - `anon public` key → untuk `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
+![Supabase Setup](https://raw.githubusercontent.com/bhaktiutama/adimology/main/public/supabase01.png)
 
 > **PENTING: Persiapan Database (Wajib Sekali Saja)**
 > Agar migrasi otomatis dapat berjalan, Anda perlu menyiapkan infrastruktur pelacakan migrasi secara manual:
