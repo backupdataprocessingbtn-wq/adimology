@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { BackgroundJobLog } from '@/lib/types';
 
+let inFlightFetch: Promise<any> | null = null;
+
 export default function JobStatusIndicator() {
   const [latestLog, setLatestLog] = useState<BackgroundJobLog | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -11,15 +13,31 @@ export default function JobStatusIndicator() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchStatus = async () => {
-    try {
-      const res = await fetch('/api/job-logs?limit=1');
-      const data = await res.json();
-      if (data.success && data.data.length > 0) {
+    if (inFlightFetch) {
+      const data = await inFlightFetch;
+      if (data && data.success && data.data.length > 0) {
         setLatestLog(data.data[0]);
       }
-    } catch (error) {
-      console.error('Failed to fetch job status', error);
+      return data;
     }
+
+    inFlightFetch = (async () => {
+      try {
+        const res = await fetch('/api/job-logs?limit=1');
+        const data = await res.json();
+        if (data.success && data.data.length > 0) {
+          setLatestLog(data.data[0]);
+        }
+        return data;
+      } catch (error) {
+        console.error('Failed to fetch job status', error);
+        throw error;
+      } finally {
+        inFlightFetch = null;
+      }
+    })();
+
+    return inFlightFetch;
   };
 
   const handleRetry = async () => {
@@ -90,7 +108,7 @@ export default function JobStatusIndicator() {
       >
         <div className={`token-dot ${statusClass}`} />
         <span style={{ 
-          color: isFailed ? '#ff4d4d' : isRunning ? 'var(--accent-warning)' : 'var(--accent-success)',
+          color: isFailed ? '#ff4d4d' : isRunning ? 'var(--accent-orange)' : 'var(--accent-success)',
           whiteSpace: 'nowrap'
         }}>
           {statusLabel}
